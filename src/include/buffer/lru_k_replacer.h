@@ -14,10 +14,10 @@
 
 #include <limits>
 #include <list>
+#include <memory>
 #include <mutex>  // NOLINT
 #include <unordered_map>
 #include <vector>
-#include <memory>
 
 #include "common/config.h"
 #include "common/macros.h"
@@ -27,31 +27,33 @@ namespace bustub {
 enum class AccessType { Unknown = 0, Get, Scan };
 
 class LRUKNode {
-  //这个类只有私有成员变量，也没有对其变量操作的get，set方法，
-  //考虑一下应该是需要构造函数和get，set方法
+  // 这个类只有私有成员变量，也没有对其变量操作的get，set方法，
+  // 考虑一下应该是需要构造函数和get，set方法
  public:
-  LRUKNode () = default;
-  LRUKNode (frame_id_t fid, size_t k = 1, bool is_evictable = false, size_t current_timestamp = 0) 
-    : k_(k), fid_(fid), is_evictable_(is_evictable) {
-      history_.emplace_back(current_timestamp);     //距离当前时间最长没被访问的放在链表最前面
+  LRUKNode() = default;
+  LRUKNode(frame_id_t fid, size_t current_timestamp, size_t k = 1, bool is_evictable = false)
+      : k_(k), fid_(fid), is_evictable_(is_evictable) {
+    history_.emplace_back(current_timestamp);  // 距离当前时间最长没被访问的放在链表最前面
   }
-  LRUKNode (LRUKNode&&) = default;
-  LRUKNode (const LRUKNode&) = default;
-  LRUKNode& operator= (const LRUKNode&) = default;
-  auto GetHistory() -> std::list<size_t> { return history_; }
+  LRUKNode(LRUKNode &&) = default;
+  LRUKNode(const LRUKNode &) = default;
+  auto operator=(const LRUKNode &) -> LRUKNode & = default;
+  auto GetHistory() -> std::list<size_t> & { return history_; }
   auto GetK() const -> size_t { return k_; }
   void SetK(size_t k) { k_ = k; }
   auto GetFrameID() const -> frame_id_t { return fid_; }
   auto GetEvict() const -> bool { return is_evictable_; }
   void SetEvict(bool is_evictable) { is_evictable_ = is_evictable; }
+  std::list<frame_id_t>::iterator pos_;
+
  private:
   /** History of last seen K timestamps of this page. Least recent timestamp stored in front. */
   // Remove maybe_unused if you start using them. Feel free to change the member variables as you want.
 
-  /*[[maybe_unused]]*/ std::list<size_t> history_;
-  /*[[maybe_unused]]*/ size_t k_;
-  /*[[maybe_unused]]*/ frame_id_t fid_;
-  /*[[maybe_unused]]*/ bool is_evictable_{false};
+  std::list<size_t> history_;
+  size_t k_;
+  frame_id_t fid_;
+  bool is_evictable_{false};
 };
 
 /**
@@ -167,13 +169,16 @@ class LRUKReplacer {
 
  private:
   // TODO(student): implement me! You can replace these member variables as you like.
-  // Remove maybe_unused if you start using them.
-  std::unordered_map<frame_id_t, std::shared_ptr<LRUKNode>> node_store_;      //当前帧的集合, 为了方便操作对象，应该使用智能指针
-  /*[[maybe_unused]]*/ size_t current_timestamp_{0};                          //当前的时间戳
-  /*[[maybe_unused]]*/ size_t curr_size_{0};                                  //替换器当前存储了多少个帧
-  /*[[maybe_unused]]*/ size_t replacer_size_;                                 //替换器的容量
-  /*[[maybe_unused]]*/ size_t k_;                                             //设置的K值
-  /*[[maybe_unused]]*/ std::mutex latch_;                                     //锁存器
+  // Remove maybe_unused if you start using them
+
+  std::unordered_map<frame_id_t, LRUKNode> node_store_;  // 当前帧的集合，每个LRUNode节点都在存储在 node_store_中
+  size_t current_timestamp_{0};                          // 当前的时间戳
+  size_t curr_size_{0};                                  // 替换器当前存储了多少个帧
+  size_t replacer_size_;                                 // 替换器的容量
+  size_t k_;                                             // 设置的K值
+  std::mutex latch_;                                     // 锁存器
+  std::list<frame_id_t> k_replacer_;                     // 追踪访问次数已经达到k个的页面
+  std::list<frame_id_t> inf_replacer_;  // 未达到k次的页面距离为inf，追踪该类页面，并优先从其中替换页面
 };
 
 }  // namespace bustub
