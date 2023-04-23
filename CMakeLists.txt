@@ -4,6 +4,10 @@ set(BUILD_SHARED_LIBS OFF) # We expect external libraries to be linked staticall
 set(CMAKE_CXX_STANDARD 17) # Compile as C++17.
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # Require C++17 support.
 
+# set c++ compliler to clang-15. Alex Will changed
+set (CMAKE_C_COMPILER "/usr/lib/llvm-15/bin/clang")
+set (CMAKE_CXX_COMPILER "/usr/lib/llvm-15/bin/clang++")
+
 project(BusTub
         VERSION 2023.1
         DESCRIPTION "The BusTub Relational Database Management System (Educational) @ https://github.com/cmu-db/bustub"
