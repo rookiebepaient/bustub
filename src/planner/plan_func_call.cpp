@@ -40,9 +40,9 @@ auto Planner::GetFuncCallFromFactory(const std::string &func_name, std::vector<A
   // 2. verify the number of args (should be 1), refer to the test cases for when you should throw an `Excepetion`.
   // 3. return a `StringExpression` std::shared_ptr.
   //throw Exception(fmt::format("func call {} not supported in planner yet", func_name));
-
+  std::cout << "into Planner::GetFuncCallFromFactory" << std::endl;
   AbstractExpressionRef ret = nullptr;
-  if (func_name == "lower" || func_name == "upper") {
+  if ("lower" == func_name || "upper" == func_name) {
     if (args.size() == 1) {
       if (args.at(0)->GetChildAt(0)->GetReturnType() != TypeId::VARCHAR) {
         throw bustub::NotImplementedException("expect the first arg to be varchar");
@@ -51,6 +51,7 @@ auto Planner::GetFuncCallFromFactory(const std::string &func_name, std::vector<A
       }
     }
   }
+  std::cout << "ret = " << ret << std::endl;
   return ret;
 }
 

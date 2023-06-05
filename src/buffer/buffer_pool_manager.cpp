@@ -22,9 +22,9 @@ BufferPoolManager::BufferPoolManager(size_t pool_size, DiskManager *disk_manager
                                      LogManager *log_manager)
     : pool_size_(pool_size), disk_manager_(disk_manager), log_manager_(log_manager) {
   // TODO(students): remove this line after you have implemented the buffer pool manager
-  // throw NotImplementedException(
-  //     "BufferPoolManager is not implemented yet. If you have finished implementing BPM, please remove the throw "
-  //     "exception line in `buffer_pool_manager.cpp`.");
+  throw NotImplementedException(
+      "BufferPoolManager is not implemented yet. If you have finished implementing BPM, please remove the throw "
+      "exception line in `buffer_pool_manager.cpp`.");
 
   // we allocate a consecutive memory space for the buffer pool
   pages_ = new Page[pool_size_];
