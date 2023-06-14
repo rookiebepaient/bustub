@@ -3,7 +3,8 @@
 
 namespace bustub {
 
-BasicPageGuard::BasicPageGuard(BasicPageGuard &&that) noexcept {
+BasicPageGuard::BasicPageGuard(BasicPageGuard &&that) noexcept 
+  :bpm_(nullptr), page_(nullptr) {
   bpm_ = that.bpm_;
   page_ = that.page_;
   that.bpm_ = nullptr;
@@ -17,9 +18,13 @@ void BasicPageGuard::Drop() {
 }
 
 auto BasicPageGuard::operator=(BasicPageGuard &&that) noexcept -> BasicPageGuard & {
-  bpm_ = that.bpm_;
-  page_ = that.page_;
-  that.Drop();
+  // NOTE: !!! avoid self assignment
+  if (this != &that) {
+    this->Drop();
+    bpm_ = that.bpm_;
+    page_ = that.page_;
+    that.Drop();
+  }
   return *this;
 }
 
@@ -29,7 +34,8 @@ BasicPageGuard::~BasicPageGuard() {
   }
 }  // NOLINT
 
-ReadPageGuard::ReadPageGuard(ReadPageGuard &&that) noexcept {
+ReadPageGuard::ReadPageGuard(ReadPageGuard &&that) noexcept 
+  : guard_() {
   guard_.bpm_ = that.guard_.bpm_;
   guard_.page_ = that.guard_.page_;
   that.guard_.bpm_ = nullptr;
@@ -37,14 +43,16 @@ ReadPageGuard::ReadPageGuard(ReadPageGuard &&that) noexcept {
 }
 
 auto ReadPageGuard::operator=(ReadPageGuard &&that) noexcept -> ReadPageGuard & {
-  guard_.bpm_ = that.guard_.bpm_;
-  guard_.page_ = that.guard_.page_;
-  that.Drop();
+  if (this != &that) {
+    guard_.Drop();
+    guard_.bpm_ = that.guard_.bpm_;
+    guard_.page_ = that.guard_.page_;
+    that.Drop();
+  }
   return *this;
 }
 
 void ReadPageGuard::Drop() {
-  guard_.bpm_->UnpinPage(guard_.page_->GetPageId(), guard_.page_->IsDirty());
   guard_.page_->RUnlatch();
   guard_.Drop();
 }
@@ -63,14 +71,16 @@ WritePageGuard::WritePageGuard(WritePageGuard &&that) noexcept {
 }
 
 auto WritePageGuard::operator=(WritePageGuard &&that) noexcept -> WritePageGuard & {
-  guard_.bpm_ = that.guard_.bpm_;
-  guard_.page_ = that.guard_.page_;
-  that.Drop();
+  if (this != &that) {
+    this->Drop();
+    guard_.bpm_ = that.guard_.bpm_;
+    guard_.page_ = that.guard_.page_;
+    that.Drop();
+  }
   return *this;
 }
 
 void WritePageGuard::Drop() {
-  guard_.bpm_->UnpinPage(guard_.page_->GetPageId(), guard_.page_->IsDirty());
   guard_.page_->WUnlatch();
   guard_.Drop();
 }
