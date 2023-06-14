@@ -130,14 +130,14 @@ auto BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty, [[maybe_unus
   // 让缓存池中的页取消固定
   // 如果目标页不存在，或者固定数到达1了,直接返回false
   auto page_iter = page_table_.find(page_id);
-  if (page_iter == page_table_.end()) {
+  if (page_table_.end() == page_iter) {
     return false;
   }
-  if (pages_[page_iter->second].GetPinCount() <= 0) {
+  if (0 >= pages_[page_iter->second].GetPinCount()) {
     return false;
   }
   pages_[page_iter->second].pin_count_--;
-  if (pages_[page_iter->second].GetPinCount() == 0) {
+  if (0 == pages_[page_iter->second].GetPinCount()) {
     replacer_->SetEvictable(page_iter->second, true);
   }
   if (is_dirty) {

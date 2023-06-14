@@ -44,11 +44,13 @@ auto Planner::GetFuncCallFromFactory(const std::string &func_name, std::vector<A
   AbstractExpressionRef ret = nullptr;
   if ("lower" == func_name || "upper" == func_name) {
     if (args.size() == 1) {
-      if (args.at(0)->GetChildAt(0)->GetReturnType() != TypeId::VARCHAR) {
-        throw bustub::NotImplementedException("expect the first arg to be varchar");
-      } else {
+      std::cout << "vector<AbstractExpressionRef> has one element\n";
+      // if (args.at(0)->GetChildAt(0)->GetReturnType() != TypeId::VARCHAR) {
+      //   std::cout << "throw exeception\n";
+      //   throw bustub::NotImplementedException("expect the first arg to be varchar");
+      // } else {
+      // }
         ret = args.at(0);
-      }
     }
   }
   std::cout << "ret = " << ret << std::endl;
